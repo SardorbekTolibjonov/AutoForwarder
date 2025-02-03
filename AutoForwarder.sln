@@ -5,7 +5,7 @@ VisualStudioVersion = 17.12.35514.174
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{992BD832-DAF5-4BBF-9AF5-FB9AA722B1B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoForwarder.Api", "src\AutoForwarder.Api\AutoForwarder.Api.csproj", "{8C71D022-BB13-4168-AD52-41ABCC6B3595}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoForwarderApi", "src\AutoForwarderApi\AutoForwarderApi.csproj", "{8C71D022-BB13-4168-AD52-41ABCC6B3595}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoForwarder.Service", "src\AutoForwarder.Service\AutoForwarder.Service.csproj", "{5DCCF12C-6DA7-40E9-90E0-EEF6A028C5FB}"
 EndProject
