@@ -26,3 +26,13 @@ jobs:
       - name: Publish project
         run: dotnet publish -c Release -o publish
 
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /projects/AutoForwarder
+            git pull origin master
+            docker compose up -d --build
