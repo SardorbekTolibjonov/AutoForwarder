@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IUserBotService, UserBotService>();
+builder.Services.AddSingleton<IUserBotService, UserBotService>();
 
 // WTelegramClient 
 builder.Services.AddSingleton(provider =>
@@ -44,6 +44,9 @@ app.UseAuthorization();
 
 
 app.MapControllers();
+
+var userBotService = app.Services.GetRequiredService<IUserBotService>();
+userBotService.ForwardMessageAsync(default);
 
 app.Run();
         
