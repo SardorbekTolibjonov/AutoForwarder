@@ -11,6 +11,8 @@ services:
       NAME: "Auto Forwarder"
     networks:
       - app_network
+    ports:
+      - "5252:5252"
 
 networks:
   app_network:
