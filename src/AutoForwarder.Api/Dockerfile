@@ -6,12 +6,11 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-COPY ./src/AutoForwarder.Api/AutoForwarder.Api.csproj ./src/AutoForwarder.Api/
-COPY ./src/AutoForwarder.Service/AutoForwarder.Service.csproj ./src/AutoForwarder.Service/
+COPY . .
 
 RUN dotnet restore "src/AutoForwarder.Api/AutoForwarder.Api.csproj"
 COPY . .
-WORKDIR "/src/src/AutoForwarder.Api"
+WORKDIR "/src/AutoForwarder.Api"
 RUN dotnet build "AutoForwarder.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
