@@ -4,7 +4,7 @@ services:
   autoforwarder.api:
     container_name: autoforwarder.api
     build:
-      context: ./src/AutoForwarderApi
+      context: ./src/AutoForwarder.Api
       dockerfile: Dockerfile
     restart: always
     networks:
