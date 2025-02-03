@@ -4,9 +4,9 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY . .
-RUN dotnet restore "src/AutoForwarder.Api/AutoForwarder.Api.csproj"
+RUN dotnet restore "AutoForwarder.Api/AutoForwarder.Api.csproj"
 COPY . .
-WORKDIR "/src/src/AutoForwarder.Api"
+WORKDIR "/src/AutoForwarder.Api"
 RUN dotnet build "AutoForwarder.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
