@@ -11,6 +11,7 @@ public class UserBotService : IUserBotService
 {
     private readonly Client client;
     private readonly ILogger<UserBotService> logger;
+    private static HashSet<long> sentMessageIds = new HashSet<long>();
     public UserBotService(
         Client client,
         IConfiguration configuration,
@@ -19,6 +20,7 @@ public class UserBotService : IUserBotService
         this.client = client;
         this.logger = logger;
     }
+
     public async Task ForwardMessageAsync(CancellationToken cancellationToken)
     {
         try
@@ -26,9 +28,7 @@ public class UserBotService : IUserBotService
             var user = await this.client.LoginUserIfNeeded();
             var selfId = user.id;
 
-
             long targetChatId = 2020480421;
-            long targetAccessHash = 4824410005556210455;
 
             this.client.OnUpdates += async updates =>
             {
@@ -38,6 +38,7 @@ public class UserBotService : IUserBotService
                     {
                         return; // Eventni to'xtatish
                     }
+
                     if (updates is Updates updatesObj)
                     {
                         foreach (var update in updatesObj.updates)
@@ -79,26 +80,17 @@ public class UserBotService : IUserBotService
                                         string messageLink = $"[havola](https://t.me/c/{chat?.ID}/{message?.id})";
 
                                         string text = message.message;
-                                        if (message?.media != null)
-                                            text = "Guruhga ovozli xabar yoki media keldi";
+                                        string lowerCaseText = text.ToLower();
+                                        if (lowerCaseText.Contains("olaman") || lowerCaseText.Contains("olamiz") ||
+                                            lowerCaseText.Contains("yuraman") || lowerCaseText.Contains("yuramiz")||
+                                            lowerCaseText.Contains("оламан") || lowerCaseText.Contains("оламиз") ||
+                                            lowerCaseText.Contains("юраман") || lowerCaseText.Contains("юримиз"))
+                                       
+                                        {
+                                            continue; // Xabar yuborilmasin
+                                        }
 
-                                        string forwardMessage =
-                                            $"📜 *Xabar*: \n{text}\n\n" +
-                                            $"👤 *Yuboruvchi Android*: {userLinkAndroid}\n" +
-                                            $"👤 *Yuboruvchi IOS*: {userLinkIOS}\n" +
-                                            $"📞 *Raqami*: +{senderPhone}\n" +
-                                            $"🏷️ *Username*: {senderUsername}\n" +
-                                            $"📌 *Group*: {groupLink}\n" +
-                                            $"👉 *Xabarga o'tish*: {messageLink}\n";
-
-                                        var entities = client.MarkdownToEntities(ref forwardMessage);
-
-                                        await client.SendMessageAsync(
-                                                new InputPeerChannel(targetChatId, targetAccessHash),
-                                                forwardMessage,
-                                                entities: entities
-                                            );
-
+                                        await ForwardTextMessage(text, sender, chat, message);
                                     }
                                     else
                                     {
@@ -114,6 +106,7 @@ public class UserBotService : IUserBotService
                     throw new AutoForwarderException(500, ex.Message);
                 }
             };
+
             await Task.Delay(Timeout.Infinite, cancellationToken);
         }
         catch (Exception ex)
@@ -121,4 +114,47 @@ public class UserBotService : IUserBotService
             throw new AutoForwarderException(500, ex.Message);
         }
     }
+    private async Task ForwardTextMessage(string text, User sender, ChatBase chat, Message message)
+    {
+        if (sentMessageIds.Contains(message.id))
+        {
+            return; // Xabar oldin yuborilgan, qayta yuborilmaydi
+        }
+
+        if (message?.media != null)
+            text = "Guruhga ovozli xabar yoki media keldi";
+
+        sentMessageIds.Add(message.id);
+        string senderName = sender?.first_name ?? "None";
+        string senderUsername = sender != null && !string.IsNullOrEmpty(sender.username)
+                                ? $"[{sender.username.Replace("_", "\\_")}](https://t.me/{sender.username})"
+                                : "@None";
+        string senderPhone = sender?.phone ?? "None";
+        string groupLink = chat != null
+                            ? $"[{chat.Title}](https://t.me/{chat.MainUsername.Replace("_", "\\_")})"
+                            : "Group username mavjud emas";
+        string userLinkAndroid = $"[{senderName}](tg://openmessage?user_id={sender?.ID})";
+        string userLinkIOS = $"[{senderName}](tg://user?id={sender?.ID})";
+        string messageLink = $"[havola](https://t.me/c/{chat?.ID}/{message?.id})";
+
+        string forwardMessage =
+            $"📜 *Xabar*: \n{text}\n\n" +
+            $"👤 *Yuboruvchi Android*: {userLinkAndroid}\n" +
+            $"👤 *Yuboruvchi IOS*: {userLinkIOS}\n" +
+            $"📞 *Raqami*: +{senderPhone}\n" +
+            $"🏷️ *Username*: {senderUsername}\n" +
+            $"📌 *Group*: {groupLink}\n" +
+            $"👉 *Xabarga o'tish*: {messageLink}\n";
+
+        var entities = client.MarkdownToEntities(ref forwardMessage);
+
+        // Xabar yuborish va Flood wait boshqaruvi
+        await client.SendMessageAsync(
+                        new InputPeerChannel(2020480421, 4824410005556210455),
+                        forwardMessage,
+                        entities: entities
+                    );
+    }
 }
+
+
