@@ -26,7 +26,8 @@ public class UserBotService : IUserBotService
         "benzin","propan","бензин","пропан",
         "кобилт","kobilt","каммиз","kammiz","kamiz","камиз",
         "jentira","gentira","жентира","гентира",
-        "olamz","yuramz","оламз","юрамз"
+        "olamz","yuramz","оламз","юрамз",
+        "kam","kamiz","kamz","кам","камиз","камз"
     };
 
     public UserBotService(
