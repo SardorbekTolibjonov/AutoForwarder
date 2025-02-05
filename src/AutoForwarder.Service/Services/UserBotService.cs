@@ -25,7 +25,8 @@ public class UserBotService : IUserBotService
         "avto","afto","auto","aвто","aфто",
         "benzin","propan","бензин","пропан",
         "кобилт","kobilt","каммиз","kammiz","kamiz","камиз",
-        "jentira","gentira","жентира","гентира"
+        "jentira","gentira","жентира","гентира",
+        "olamz","yuramz","оламз","юрамз"
     };
 
     public UserBotService(
