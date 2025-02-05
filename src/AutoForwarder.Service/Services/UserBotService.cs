@@ -81,20 +81,6 @@ public class UserBotService : IUserBotService
 
                                     if (message.from_id is PeerUser peerUser2)
                                     {
-                                        string senderName = sender?.first_name ?? "None";
-
-                                        string senderUsername = sender != null && !string.IsNullOrEmpty(sender.username)
-                                                                ? $"[{sender.username.Replace("_", "\\_")}](https://t.me/{sender.username})"
-                                                                : "@None";
-
-                                        string senderPhone = sender?.phone ?? "None";
-                                        string groupLink = updatesObj.chats.TryGetValue(message.peer_id, out var chat1)
-                                            ? $"[{chat1.Title}](https://t.me/{chat1.MainUsername.Replace("_", "\\_")})"
-                                            : "Group username mavjud emas";
-                                        string userLinkAndroid = $"[{senderName}](tg://openmessage?user_id={sender?.ID})";
-                                        string userLinkIOS = $"[{senderName}](tg://user?id={sender?.ID})";
-                                        string messageLink = $"[havola](https://t.me/c/{chat?.ID}/{message?.id})";
-
                                         string text = message.message;
                                         string normalizedText = NormalizeText(text);
                                         if (stopWords.Any(word => normalizedText.Contains(NormalizeText(word))))
@@ -139,11 +125,11 @@ public class UserBotService : IUserBotService
         sentMessageIds.Add(message.id);
         string senderName = sender?.first_name ?? "None";
         string senderUsername = sender != null && !string.IsNullOrEmpty(sender.username)
-                                ? $"[{sender.username.Replace("_", "\\_")}](https://t.me/{sender.username})"
-                                : "@None";
+                                ? $"{sender.username.Replace("_", "\\_")}"
+                                : "None";
         string senderPhone = sender?.phone ?? "None";
         string groupLink = chat != null
-                            ? $"[{chat.Title.Replace("_", "\\_")}](https://t.me/{chat.MainUsername.Replace("_", "\\_")})"
+                            ? $"{chat.MainUsername.Replace("_", "\\_")}"
                             : "Group username mavjud emas";
         string userLinkAndroid = $"[{senderName.Replace("_", "\\_")}](tg://openmessage?user_id={sender?.ID})";
         string userLinkIOS = $"[{senderName.Replace("_", "\\_")}](tg://user?id={sender?.ID})";
@@ -154,8 +140,8 @@ public class UserBotService : IUserBotService
             $"👤 *Yuboruvchi Android*: {userLinkAndroid}\n" +
             $"👤 *Yuboruvchi IOS*: {userLinkIOS}\n" +
             $"📞 *Raqami*: +{senderPhone}\n" +
-            $"🏷️ *Username*: {senderUsername}\n" +
-            $"📌 *Group*: {groupLink}\n" +
+            $"🏷️ *Username*: @{senderUsername}\n" +
+            $"📌 *Group*: @{groupLink}\n" +
             $"👉 *Xabarga o'tish*: {messageLink}\n";
 
         var entities = client.MarkdownToEntities(ref forwardMessage);
