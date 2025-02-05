@@ -85,7 +85,8 @@ public class UserBotService : IUserBotService
                                     {
                                         string text = message.message;
                                         string normalizedText = NormalizeText(text);
-                                        if (stopWords.Any(word => normalizedText.Contains(NormalizeText(word))))
+                                        if (stopWords.Any(word => normalizedText.Contains(NormalizeText(word)) || normalizedText.Contains("aвто")) 
+                                            && !normalizedText.Contains("kamlar") && !normalizedText.Contains("камлар"))
                                         {
                                             continue; // Xabar yuborilmasin
                                         }
