@@ -2,6 +2,8 @@
 using AutoForwarder.Service.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
+using System.Text;
 using TL;
 using WTelegram;
 
@@ -12,6 +14,20 @@ public class UserBotService : IUserBotService
     private readonly Client client;
     private readonly ILogger<UserBotService> logger;
     private static HashSet<long> sentMessageIds = new HashSet<long>();
+    private readonly List<string> stopWords = new()
+    {
+        "olaman", "olamiz", "yuraman", "yuramiz",
+        "оламан", "оламиз", "юраман", "юримиз",
+        "kamdamiz", "cobolt","cobalt", "cobalt",
+        "coblat","coblat","coblt","koblt",
+        "кобальт","кобалт","коболт","коблат",
+        "камдамиз","gentra","jentra","гентра","жентра",
+        "avto","afto","auto","aвто","aфто",
+        "benzin","propan","бензин","пропан",
+        "кобилт","kobilt","каммиз","kammiz","kamiz","камиз",
+        "jentira","gentira","жентира","гентира"
+    };
+
     public UserBotService(
         Client client,
         IConfiguration configuration,
@@ -80,12 +96,8 @@ public class UserBotService : IUserBotService
                                         string messageLink = $"[havola](https://t.me/c/{chat?.ID}/{message?.id})";
 
                                         string text = message.message;
-                                        string lowerCaseText = text.ToLower();
-                                        if (lowerCaseText.Contains("olaman") || lowerCaseText.Contains("olamiz") ||
-                                            lowerCaseText.Contains("yuraman") || lowerCaseText.Contains("yuramiz")||
-                                            lowerCaseText.Contains("оламан") || lowerCaseText.Contains("оламиз") ||
-                                            lowerCaseText.Contains("юраман") || lowerCaseText.Contains("юримиз"))
-                                       
+                                        string normalizedText = NormalizeText(text);
+                                        if (stopWords.Any(word => normalizedText.Contains(NormalizeText(word))))
                                         {
                                             continue; // Xabar yuborilmasin
                                         }
@@ -131,10 +143,10 @@ public class UserBotService : IUserBotService
                                 : "@None";
         string senderPhone = sender?.phone ?? "None";
         string groupLink = chat != null
-                            ? $"[{chat.Title}](https://t.me/{chat.MainUsername.Replace("_", "\\_")})"
+                            ? $"[{chat.Title.Replace("_", "\\_")}](https://t.me/{chat.MainUsername.Replace("_", "\\_")})"
                             : "Group username mavjud emas";
-        string userLinkAndroid = $"[{senderName}](tg://openmessage?user_id={sender?.ID})";
-        string userLinkIOS = $"[{senderName}](tg://user?id={sender?.ID})";
+        string userLinkAndroid = $"[{senderName.Replace("_", "\\_")}](tg://openmessage?user_id={sender?.ID})";
+        string userLinkIOS = $"[{senderName.Replace("_", "\\_")}](tg://user?id={sender?.ID})";
         string messageLink = $"[havola](https://t.me/c/{chat?.ID}/{message?.id})";
 
         string forwardMessage =
@@ -155,6 +167,29 @@ public class UserBotService : IUserBotService
                         entities: entities
                     );
     }
+
+    private string NormalizeText(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return string.Empty;
+
+        // Unicode formatlarini oddiy shaklga o'tkazish
+        string normalizedText = input.Normalize(NormalizationForm.FormKD);
+
+        // Harflarni kichik shaklga o'tkazish va maxsus belgilarni olib tashlash
+        normalizedText = normalizedText.ToLower(new CultureInfo("en-US"));
+
+        StringBuilder cleanedText = new StringBuilder();
+        foreach (char c in normalizedText)
+        {
+            if (char.IsLetterOrDigit(c) || char.IsWhiteSpace(c))
+            {
+                cleanedText.Append(c);
+            }
+        }
+
+        return cleanedText.ToString();
+    }
+
 }
 
 
