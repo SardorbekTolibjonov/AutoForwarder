@@ -4,7 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
 using System.Text;
+using System.Threading.Channels;
 using TL;
+using TL.Methods;
 using WTelegram;
 
 namespace AutoForwarder.Service.Services;
@@ -13,6 +15,7 @@ public class UserBotService : IUserBotService
 {
     private readonly Client client;
     private readonly ILogger<UserBotService> logger;
+    private static HashSet<long> sentMessageIds = new HashSet<long>();
     private readonly List<string> stopWords = new()
     {
         "olaman", "olamiz", "yuraman", "yuramiz",
@@ -45,8 +48,10 @@ public class UserBotService : IUserBotService
             var user = await this.client.LoginUserIfNeeded();
             var selfId = user.id;
 
-            long targetChatId = 2020480421;
+            long targetChatId = 2178757722;
 
+            
+            
             this.client.OnUpdates += async updates =>
             {
                 try
@@ -63,19 +68,14 @@ public class UserBotService : IUserBotService
                             if (update is UpdateNewMessage newMessage && newMessage.message is Message message)
                             {
                                 // Target guruhdan xabar kelganda o'tkazib yuborish
-                                if ((message.peer_id is PeerChannel peerChannel && peerChannel.channel_id == targetChatId))
+                                if (message.peer_id is PeerChannel peerChannel && peerChannel.channel_id == targetChatId)
                                 {
                                     continue;
                                 }
 
-                                ChatBase chat = updatesObj.chats.TryGetValue(message.peer_id, out var foundChat) ? foundChat : null;
-                                if (message.from_id is PeerUser peerUser1)
+                                ChatBase? chat = updatesObj.chats.TryGetValue(message.peer_id, out var foundChat) ? foundChat : null;
+                                if (message.from_id is PeerUser peerUser1 && updatesObj.users.TryGetValue(peerUser1.user_id, out var foundUser))
                                 {
-                                    if (!updatesObj.users.TryGetValue(peerUser1.user_id, out var foundUser))
-                                    {
-                                        var userList = await client.Users_GetUsers(new InputUser(peerUser1.user_id, 0));
-                                        foundUser = userList.OfType<User>().FirstOrDefault();
-                                    }
                                     User sender = foundUser;
                                     if (sender?.IsBot == true)
                                         continue;
@@ -108,6 +108,7 @@ public class UserBotService : IUserBotService
             };
 
             await Task.Delay(Timeout.Infinite, cancellationToken);
+            
         }
         catch (Exception ex)
         {
@@ -123,12 +124,12 @@ public class UserBotService : IUserBotService
 
         if (message?.media != null)
             text = "Guruhga ovozli xabar yoki media keldi";
-
         sentMessageIds.Add(message.id);
+
+
+        
         string senderName = sender?.first_name ?? "None";
-        string senderUsername = sender != null && !string.IsNullOrEmpty(sender.username)
-                                ? $"{sender.username.Replace("_", "\\_")}"
-                                : "None";
+        string senderUsername = sender?.username ?? "None";
         string senderPhone = sender?.phone ?? "None";
         string groupLink = chat != null
                             ? $"{chat.MainUsername.Replace("_", "\\_")}"
@@ -150,7 +151,7 @@ public class UserBotService : IUserBotService
 
         // Xabar yuborish va Flood wait boshqaruvi
         await client.SendMessageAsync(
-                        new InputPeerChannel(2020480421, 4824410005556210455),
+                        new InputPeerChannel(2178757722, -2365879892680874661),
                         forwardMessage,
                         entities: entities
                     );

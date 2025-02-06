@@ -15,7 +15,6 @@ builder.Services.AddSingleton<IUserBotService, UserBotService>();
 builder.Services.AddSingleton(provider =>
 {
     var configuration = provider.GetRequiredService<IConfiguration>();
-    string sessionPath = Path.Combine(Directory.GetCurrentDirectory(), "wtelegram.session");
 
     return new Client(key =>
     {
@@ -24,7 +23,6 @@ builder.Services.AddSingleton(provider =>
             "api_id" => configuration["TelegramConfig:ApiId"],
             "api_hash" => configuration["TelegramConfig:ApiHash"],
             "phone_number" => configuration["TelegramConfig:PhoneNumber"],
-            "session_pathname" => sessionPath, // **SESSION FAYL UCHUN YO‘L**
             _ => null
         };
     });
