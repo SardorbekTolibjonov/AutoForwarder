@@ -13,7 +13,6 @@ public class UserBotService : IUserBotService
 {
     private readonly Client client;
     private readonly ILogger<UserBotService> logger;
-    private static HashSet<long> sentMessageIds = new HashSet<long>();
     private readonly List<string> stopWords = new()
     {
         "olaman", "olamiz", "yuraman", "yuramiz",
