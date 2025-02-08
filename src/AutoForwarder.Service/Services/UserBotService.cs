@@ -19,7 +19,7 @@ public class UserBotService : IUserBotService
     private readonly List<string> stopWords = new()
     {
         "olaman", "olamiz", "yuraman", "yuramiz",
-        "оламан", "оламиз", "юраман", "юримиз",
+        "оламан", "оламиз", "юраман", "юрамиз",
         "kamdamiz", "cobolt","cobalt", "cobalt",
         "coblat","coblat","coblt","koblt",
         "кобальт","кобалт","коболт","коблат",
