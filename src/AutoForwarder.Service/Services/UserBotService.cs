@@ -29,7 +29,9 @@ public class UserBotService : IUserBotService
         "кобилт","kobilt","каммиз","kammiz","kamiz","камиз",
         "jentira","gentira","жентира","гентира",
         "olamz","yuramz","оламз","юрамз",
-        "kam","kamiz","kamz","кам","камиз","камз"
+        "kam","kamiz","kamz","кам","камиз","камз",
+        "mexmonxona","mehmonhona","mexmonhona","mehmonxona",
+        "рубл","мехмонxона","usd","день"
     };
 
     public UserBotService(
